@@ -13,5 +13,6 @@
 $ ./check_status_armv7
 ```
 ![alt text](https://github.com/MinFengLin/check_service_status/blob/main/IMG_4166.PNG)
+![alt text](https://github.com/MinFengLin/check_service_status/blob/main/IMG_4167.PNG)
 
 ### Enjoy ~
