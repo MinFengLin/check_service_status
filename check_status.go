@@ -1,8 +1,6 @@
 package main
 
 import (
-	bot_service "bot"
-	service "service"
 	"fmt"
 	"strconv"
 
@@ -15,6 +13,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/robfig/cron/v3"
+	bot_service "github.com/MinFengLin/check_service_status/bot"
+	service "github.com/MinFengLin/check_service_status/service"
 )
 
 var (
@@ -36,17 +36,6 @@ func check(chatid *int64, token *string) {
 	}
 }
 
-func tgbot_cmd(chatid *int64, token *string) {
-	service_data = service.Parser_services()
-	services_info := "-\n"
-
-	for ii := range service_data.Services {
-		services_info = services_info + service_data.Services[ii].Ip+":"+service_data.Services[ii].Port + " - (" +service_data.Services[ii].Service + ")" + "\n"
-	}
-	services_info = services_info + "-\n"
-	bot_service.Telegram_reply_run(*chatid, *token, services_info)
-}
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
@@ -65,13 +54,13 @@ func main() {
 			check(&chatID, &yourToken)
 		})
 		check(&chatID, &yourToken)
-		go tgbot_cmd(&chatID, &yourToken)
+		go bot_service.Tgbot_cmd(&chatID, &yourToken)
 		c.Start()
 		select{}
 	} else {
 		fmt.Printf("chatID: %d, yourToken: %s, How often to run: %d (Minutes)\n", chatID, yourToken, Env_Time)
 		tChannel := time.NewTimer(time.Duration(Env_Time) * time.Minute)
-		go tgbot_cmd(&chatID, &yourToken)
+		go bot_service.Tgbot_cmd(&chatID, &yourToken)
 		for {
 			check(&chatID, &yourToken)
 			tChannel.Reset(time.Duration(Env_Time) * time.Minute)

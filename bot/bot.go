@@ -2,12 +2,13 @@ package bot
 
 import (
 	"log"
-
+	service "github.com/MinFengLin/check_service_status/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 var (
 	bot_r, bot_d *tgbotapi.BotAPI
+	service_data service.Services_slice
 )
 
 func sendMsg(msg string, chatID int64) {
@@ -37,7 +38,20 @@ func replyMsg(msg string, chatID int64) {
 				case "service":
 					replyMsg.Text = msg
 				case "help":
-					replyMsg.Text = "/service  <-- to show all service's items"
+					replyMsg.Text = "/service        <-- to show all service's items\n"
+					replyMsg.Text = replyMsg.Text + "/service_debug  <-- execute immediately check service"
+				case "service_debug":
+					service_data = service.Parser_services()
+					failed_data := ""
+					for ii := range service_data.Services {
+						service.Check_service_status(ii, 500, &service_data, &failed_data)
+					}
+					if len(failed_data) > 0 {
+						failed_data = "↻ Check Status ...... 🔴FAILED! \n - \n" + failed_data + "-"
+					} else {
+						failed_data = "↻ Check Status ...... 🟢PASS! \n" + failed_data
+					}
+					replyMsg.Text = failed_data
 				default:
 					replyMsg.Text = ""
 				}
@@ -49,6 +63,17 @@ func replyMsg(msg string, chatID int64) {
 			}
 		}()
 	}
+}
+
+func Tgbot_cmd(chatid *int64, token *string) {
+	service_data = service.Parser_services()
+	services_info := "-\n"
+
+	for ii := range service_data.Services {
+		services_info = services_info + service_data.Services[ii].Ip+":"+service_data.Services[ii].Port + " - (" +service_data.Services[ii].Service + ")" + "\n"
+	}
+	services_info = services_info + "-\n"
+	Telegram_reply_run(*chatid, *token, services_info)
 }
 
 func Telegram_reply_run(chatID int64, yourToken string, msg string) {

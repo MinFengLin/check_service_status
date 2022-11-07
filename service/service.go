@@ -9,18 +9,6 @@ import (
 	"time"
 )
 
-// https://stackoverflow.com/questions/64693710/parse-json-file-in-golang
-
-type Services_slice struct {
-	Services []Services `json:"Services"`
-}
-
-type Services struct {
-	Ip        string `json:"Ip"`
-	Service   string `json:"Service"`
-	Port      string `json:"Port"`
-}
-
 func Check_service_status(ii int, time_set int, service_data *Services_slice, failed_data *string) {
 	withtimeout := net.Dialer{Timeout: time.Duration(time_set)*time.Millisecond}
 	conn, err := withtimeout.Dial("tcp", service_data.Services[ii].Ip+":"+service_data.Services[ii].Port)

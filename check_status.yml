@@ -8,38 +8,6 @@ steps:
   commands:
     - golangci-lint run -v
 
-- name: notify_telegram
-  image: appleboy/drone-telegram
-  settings:
-    token:
-      from_secret: telegram_token
-    to:
-      from_secret: telegram_chatid
-    message: >
-      {{#success build.status}}
-      ✔ golint check PASS #{{build.number}} of `{{repo.name}}`.
-
-      📝 Commit by {{commit.author}} on `{{commit.branch}}`:
-
-      ```
-      {{commit.message}}
-      ```
-
-      🔗 {{ build.link }}
-      {{else}}
-      ❌ golint check FAIL #{{build.number}} of `{{repo.name}}`.
-
-      📝 Commit by {{commit.author}} on `{{commit.branch}}`:
-
-      ```
-      {{commit.message}}
-      ```
-
-      🔗 {{ build.link }}
-      {{/success}}
-  when:
-    status: [ success, failure ]
-
 trigger:
   branch:
   - master
