@@ -32,6 +32,7 @@ func main() {
 	Env_Time, _ := strconv.ParseInt(os.Getenv("Timer_Minutes"), 10, 64)
 	crontab_time := os.Getenv("Crontime")
 
+	go bot.Telegram_reply_run(&chatID, &yourToken)
 	if len(crontab_time) > 0 {
 		fmt.Printf("chatID: %d, yourToken: %s, Use crontab: %s \n", chatID, yourToken, crontab_time)
 		c := cron.New()
@@ -41,13 +42,11 @@ func main() {
 		})
 		failed_data := service.Check_service_status()
 		bot.Telegram_bot_run(&chatID, &yourToken, failed_data)
-		go bot.Telegram_reply_run(&chatID, &yourToken)
 		c.Start()
 		select {}
 	} else {
 		fmt.Printf("chatID: %d, yourToken: %s, How often to run: %d (Minutes)\n", chatID, yourToken, Env_Time)
 		tChannel := time.NewTimer(time.Duration(Env_Time) * time.Minute)
-		go bot.Telegram_reply_run(&chatID, &yourToken)
 		for {
 			failed_data := service.Check_service_status()
 			bot.Telegram_bot_run(&chatID, &yourToken, failed_data)

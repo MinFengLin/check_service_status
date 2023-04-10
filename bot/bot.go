@@ -30,30 +30,28 @@ func replyMsg(chatID int64) {
 	updates, _ := bot_r.GetUpdatesChan(updateConfig)
 	for update_i := range updates {
 		update := update_i
-		go func() {
-			cmd_text := update.Message.Text
-			chatID := update.Message.Chat.ID
-			replyMsg := tgbotapi.NewMessage(chatID, cmd_text)
-			replyMsg.ReplyToMessageID = update.Message.MessageID
-			if update.Message.IsCommand() {
-				switch update.Message.Command() {
-				case "service":
-					replyMsg.Text = service.List_service_status()
-				case "help":
-					replyMsg.Text = "/service        <-- to show all service's items\n"
-					replyMsg.Text = replyMsg.Text + "/service_debug  <-- execute immediately check service"
-				case "service_debug":
-					replyMsg.Text = service.Check_service_status()
-				default:
-					replyMsg.Text = ""
-				}
-			} else {
+		cmd_text := update.Message.Text
+		chatID := update.Message.Chat.ID
+		replyMsg := tgbotapi.NewMessage(chatID, cmd_text)
+		replyMsg.ReplyToMessageID = update.Message.MessageID
+		if update.Message.IsCommand() {
+			switch update.Message.Command() {
+			case "service":
+				replyMsg.Text = service.List_service_status()
+			case "help":
+				replyMsg.Text = "/service        <-- to show all service's items\n"
+				replyMsg.Text = replyMsg.Text + "/service_debug  <-- execute immediately check service"
+			case "service_debug":
+				replyMsg.Text = service.Check_service_status()
+			default:
 				replyMsg.Text = ""
 			}
-			if len(replyMsg.Text) > 0 {
-				_, _ = bot_r.Send(replyMsg)
-			}
-		}()
+		} else {
+			replyMsg.Text = ""
+		}
+		if len(replyMsg.Text) > 0 {
+			_, _ = bot_r.Send(replyMsg)
+		}
 	}
 }
 
